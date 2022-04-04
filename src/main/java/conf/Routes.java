@@ -40,13 +40,14 @@ import ninja.utils.NinjaProperties;
 import com.google.inject.Inject;
 
 import controllers.AdminController;
-import controllers.ApiController;
 import controllers.ApplicationController;
-import controllers.ArticleController;
 import controllers.BidController;
 import controllers.FeedbackController;
 import controllers.AuthController;
 import controllers.ProductController;
+import filters.AdminFilter;
+import filters.CorsHandlerFilter;
+import filters.ValidateUserFilter;
 
 public class Routes implements ApplicationRoutes {
     
@@ -62,7 +63,8 @@ public class Routes implements ApplicationRoutes {
      * @param router
      *            The default router of this application
      */
-    @Override
+    @SuppressWarnings("unchecked")
+	@Override
     public void init(Router router) {  
         
         // puts test data into db:
@@ -74,49 +76,54 @@ public class Routes implements ApplicationRoutes {
         // Login / Logout
         ///////////////////////////////////////////////////////////////////////
         router.GET().route("/api/login").with(AuthController::login);
-        router.POST().route("/api/login").with(AuthController::loginPost);
-        router.GET().route("/api/logout").with(AuthController::logout);
+        router.POST().route("/api/login").filters(CorsHandlerFilter.class).with(AuthController::loginPost);
+        router.GET().route("/api/logout").filters(CorsHandlerFilter.class).with(AuthController::logout);
         
-        router.POST().route("/api/register").with(AuthController::registerUser);
-        router.PUT().route("/api/updateUser").with(AuthController::updateUser);
-        router.GET().route("/api/user/{uid}").with(AuthController::getUser);
+        router.POST().route("/api/register").filters(CorsHandlerFilter.class).with(AuthController::registerUser);
         
-        
-        router.POST().route("/api/addProduct").with(ProductController::addProduct);
-        router.DELETE().route("/api/deleteProduct").with(ProductController::deleteProduct);
-        router.PUT().route("/api/updateProduct/{pid}").with(ProductController::updateProduct);
+        router.PUT().route("/api/updateUser").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(AuthController::updateUser);
+        router.GET().route("/api/user/{uid}").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(AuthController::getUser);
         
         
-        router.GET().route("/api/product").with(ProductController::getAllProducts);
-        router.GET().route("/api/product/{pid}").with(ProductController::getSingleProduct);
-        router.PUT().route("/api/product/productBidStatus/{pid}").with(BidController::changeBidStatus);
+        router.POST().route("/api/addProduct").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(ProductController::addProduct);
+        router.DELETE().route("/api/deleteProduct").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(ProductController::deleteProduct);
+        router.PUT().route("/api/updateProduct/{pid}").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(ProductController::updateProduct);
         
         
-        router.POST().route("/api/bid/{pid}").with(BidController::bidOnProduct);
-        router.POST().route("/api/feedback/{uid}").with(FeedbackController::addFeedback);
+        router.GET().route("/api/product").filters(CorsHandlerFilter.class).with(ProductController::getAllProducts);
+        router.GET().route("/api/product/{pid}").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(ProductController::getSingleProduct);
+        router.PUT().route("/api/product/productBidStatus/{pid}").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(BidController::changeBidStatus);
+        router.GET().route("/api/product/getByTitle/{title}").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(ProductController::getProductByTitle);
+        router.GET().route("/api/product/getBySoldTo/{uid}").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(ProductController::getProductBySoldTo);
+        router.GET().route("/api/product/getByTitleAndUid/{title}/{uid}").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(ProductController::getProductByTitleAndUid);
         
-        router.POST().route("/api/admin/deleteUser").with(AdminController::deleteUser);
-        router.POST().route("/api/admin/deleteProduct").with(AdminController::deleteProduct);
+        router.POST().route("/api/bid/{pid}").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(BidController::bidOnProduct);
+        router.GET().route("/api/getBid/{pid}").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(BidController::getAllBidsByPid);
+        router.GET().route("/api/getBidByUid/{uid}").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(BidController::getAllBidsByUid);
+        router.POST().route("/api/feedback/{uid}").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(FeedbackController::addFeedback);
+        
+        router.POST().route("/api/admin/deleteUser/{uid}").filters(ValidateUserFilter.class, AdminFilter.class, CorsHandlerFilter.class).with(AdminController::deleteUser);
+        router.POST().route("/api/admin/deleteProduct/{pid}").filters(ValidateUserFilter.class, AdminFilter.class, CorsHandlerFilter.class).with(AdminController::deleteProduct);
         
         ///////////////////////////////////////////////////////////////////////
         // Create new article
         ///////////////////////////////////////////////////////////////////////
-        router.GET().route("/article/new").with(ArticleController::articleNew);
-        router.POST().route("/article/new").with(ArticleController::articleNewPost);
+//        router.GET().route("/article/new").with(ArticleController::articleNew);
+//        router.POST().route("/article/new").with(ArticleController::articleNewPost);
         
         ///////////////////////////////////////////////////////////////////////
         // Create new article
         ///////////////////////////////////////////////////////////////////////
-        router.GET().route("/article/{id}").with(ArticleController::articleShow);
+//        router.GET().route("/article/{id}").with(ArticleController::articleShow);
 
         ///////////////////////////////////////////////////////////////////////
         // Api for management of software
         ///////////////////////////////////////////////////////////////////////
-        router.GET().route("/api/{username}/articles.json").with(ApiController::getArticlesJson);
-        router.GET().route("/api/{username}/article/{id}.json").with(ApiController::getArticleJson);
-        router.GET().route("/api/{username}/articles.xml").with(ApiController::getArticlesXml);
-        router.POST().route("/api/{username}/article.json").with(ApiController::postArticleJson);
-        router.POST().route("/api/{username}/article.xml").with(ApiController::postArticleXml);
+//        router.GET().route("/api/{username}/articles.json").with(ApiController::getArticlesJson);
+//        router.GET().route("/api/{username}/article/{id}.json").with(ApiController::getArticleJson);
+//        router.GET().route("/api/{username}/articles.xml").with(ApiController::getArticlesXml);
+//        router.POST().route("/api/{username}/article.json").with(ApiController::postArticleJson);
+//        router.POST().route("/api/{username}/article.xml").with(ApiController::postArticleXml);
  
         ///////////////////////////////////////////////////////////////////////
         // Assets (pictures / javascript)
@@ -128,6 +135,7 @@ public class Routes implements ApplicationRoutes {
         // Index / Catchall shows index page
         ///////////////////////////////////////////////////////////////////////
         router.GET().route("/.*").with(ApplicationController::index);
+        router.OPTIONS().route("/.*").with(ApplicationController::indexOptions);
     }
 
 }

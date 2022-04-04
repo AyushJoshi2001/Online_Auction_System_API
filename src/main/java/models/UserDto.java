@@ -8,8 +8,8 @@ public class UserDto {
     public String profile_pic;
     public String mobile;
     public String address;
-    public UserType userType;
-    
+    public String about;
+    public int isAdmin;
     
 	public UserDto() {}
     

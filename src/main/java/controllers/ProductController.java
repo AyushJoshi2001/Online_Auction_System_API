@@ -1,6 +1,8 @@
 package controllers;
 
 
+import java.util.List;
+
 import com.google.inject.Inject;
 
 import dao.ProductDao;
@@ -32,7 +34,31 @@ public class ProductController {
 		if(product != null) {			 
 			return Results.json().render(product);
 		}
-		return Results.json().render("Product Not Found");
+		return Results.badRequest().json().render("Product Not Found");
+	}
+	
+	public Result getProductByTitle(@PathParam("title") String title) {
+		List<Product> products = productDao.getProductByTitle(title);
+		if(products != null) {			
+			return Results.json().render(products);
+		}
+		return Results.json().render("No Product Found");
+	}
+	
+	public Result getProductBySoldTo(@PathParam("uid") Long uid) {
+		List<Product> products = productDao.getProductBySoldTo(uid);
+		if(products != null) {			
+			return Results.json().render(products);
+		}
+		return Results.json().render("No Product Found");
+	}
+	
+	public Result getProductByTitleAndUid(@PathParam("title") String title, @PathParam("uid") Long uid) {
+		List<Product> products = productDao.getProductByTitleAndUid(title, uid);
+		if(products != null) {			
+			return Results.json().render(products);
+		}
+		return Results.json().render("No Product Found");
 	}
 
 	

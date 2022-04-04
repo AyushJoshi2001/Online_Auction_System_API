@@ -1,8 +1,11 @@
 package controllers;
 
+import java.util.List;
+
 import com.google.inject.Inject;
 
 import dao.BidDao;
+import models.Bid;
 import models.BidDto;
 import models.ProductDto;
 import ninja.Result;
@@ -22,7 +25,22 @@ public class BidController {
 		return Results.badRequest().json().render("Bad Request");
 	}
 	
-
+	
+	public Result getAllBidsByPid(@PathParam("pid") Long pid) {
+		List<Bid> bids = bidDao.getAllBidsByPid(pid);
+		if(bids!=null) {
+			return Results.json().render(bids);
+		}
+		return Results.badRequest().json().render("Bad Request");
+	}
+	
+	public Result getAllBidsByUid(@PathParam("uid") Long uid) {
+		List<Bid> bids = bidDao.getAllBidsByUid(uid);
+		if(bids!=null) {
+			return Results.json().render(bids);
+		}
+		return Results.badRequest().json().render("Bad Request");
+	}
 	
 	public Result changeBidStatus(ProductDto productDto, @PathParam("pid") Long pid) {
 		

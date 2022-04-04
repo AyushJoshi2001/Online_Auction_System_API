@@ -23,18 +23,15 @@ import com.google.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 
-import models.Article;
 import models.Bid;
 import models.Bid_Status;
 import models.Feedback;
 import models.Product;
 import models.Sold_Status;
 import models.User;
-import models.UserType;
 
 import com.google.inject.Provider;
 import com.google.inject.persist.Transactional;
-import javax.persistence.FlushModeType;
 
 public class SetupDao {
     
@@ -52,17 +49,17 @@ public class SetupDao {
         if (users.size() == 0) {
 
             // Create a new user and save it
-            User bob = new User("bob", "bob@gmail.com", "password", "pic_url", "4564512", "address", UserType.Buyer);
+            User bob = new User("bob", "bob@gmail.com", "password", "", "4564512", "address", "about section");
             entityManager.persist(bob);
             
             // Create a new product and save it
             
-            Product prod1 = new Product("car", "http://google.com", "this is demo product", Bid_Status.Open, new Long(8375889), Sold_Status.Unsold);
+            Product prod1 = new Product("car", "http://google.com", "this is demo product", Bid_Status.Open, new Long(8375889), Sold_Status.Unsold, new Long(100));
             entityManager.persist(prod1);
             
             // Create a new bid and save it
             
-            Bid bid1 = new Bid(new Long(12345), new Long(54678), new Long(100));
+            Bid bid1 = new Bid(new Long(12345), new Long(54678), new Long(100), "dummy");
             entityManager.persist(bid1);
             
             // Create a new feedback and save it
@@ -70,20 +67,20 @@ public class SetupDao {
             Feedback feed1 = new Feedback(new Long(12345), "demo feedback");
             entityManager.persist(feed1);
             
-            // Create a new post
-            Article bobPost3 = new Article(bob, "My third post", lipsum);
-            entityManager.persist(bobPost3);
-
-            // Create a new post
-            Article bobPost2 = new Article(bob, "My second post", lipsum);
-            entityManager.persist(bobPost2);
-            
-            // Create a new post
-            Article bobPost1 = new Article(bob, post1Title, post1Content);
-            entityManager.persist(bobPost1);
-            
-            entityManager.setFlushMode(FlushModeType.COMMIT);
-            entityManager.flush();
+//            // Create a new post
+//            Article bobPost3 = new Article(bob, "My third post", lipsum);
+//            entityManager.persist(bobPost3);
+//
+//            // Create a new post
+//            Article bobPost2 = new Article(bob, "My second post", lipsum);
+//            entityManager.persist(bobPost2);
+//            
+//            // Create a new post
+//            Article bobPost1 = new Article(bob, post1Title, post1Content);
+//            entityManager.persist(bobPost1);
+//            
+//            entityManager.setFlushMode(FlushModeType.COMMIT);
+//            entityManager.flush();
         }
 
     }

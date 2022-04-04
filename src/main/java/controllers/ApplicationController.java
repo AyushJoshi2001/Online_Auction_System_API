@@ -32,14 +32,10 @@
 
 package controllers;
 
-import java.util.List;
-import java.util.Map;
 
-import models.Article;
 import ninja.Result;
 import ninja.Results;
 
-import com.google.common.collect.Maps;
 import com.google.inject.Inject;
 
 import dao.ArticleDao;
@@ -72,16 +68,19 @@ public class ApplicationController {
 
     public Result index() {
 
-        Article frontPost = articleDao.getFirstArticleForFrontPage();
+//        Article frontPost = articleDao.getFirstArticleForFrontPage();
+//
+//        List<Article> olderPosts = articleDao.getOlderArticlesForFrontPage();
+//
+//        Map<String, Object> map = Maps.newHashMap();
+//        map.put("frontArticle", frontPost);
+//        map.put("olderArticles", olderPosts);
 
-        List<Article> olderPosts = articleDao.getOlderArticlesForFrontPage();
-
-        Map<String, Object> map = Maps.newHashMap();
-        map.put("frontArticle", frontPost);
-        map.put("olderArticles", olderPosts);
-
-        return Results.html().render("frontArticle", frontPost)
-                .render("olderArticles", olderPosts);
-
+    	return Results.notFound().json().render("404 Not Found");
+    }
+    
+    public Result indexOptions() {
+    	return Results.json().addHeader("Content-Type", "application/json").addHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE").addHeader("Access-Control-Allow-Credentials", "true").addHeader("Access-Control-Allow-Origin", "http://localhost:4200").addHeader("Access-Control-Allow-Headers", "content-type").render("cors accepted...");
+    	
     }
 }

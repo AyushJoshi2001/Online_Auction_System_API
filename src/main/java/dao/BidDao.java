@@ -1,7 +1,10 @@
 package dao;
 
+import java.util.List;
+
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -11,6 +14,7 @@ import models.Bid;
 import models.BidDto;
 import models.Product;
 import models.ProductDto;
+import ninja.jpa.UnitOfWork;
 
 public class BidDao {
 	@Inject
@@ -21,12 +25,46 @@ public class BidDao {
 		EntityManager entityManager = entityManagerProvider.get();
 		
 		try {
-			Bid bid = new Bid(bidDto.uid, pid, bidDto.amount);
+			Bid bid = new Bid(bidDto.uid, pid, bidDto.amount, bidDto.product_name);
 			entityManager.persist(bid);
 			return true;
 		}
 		catch (Exception e) {
 			return false;
+		}
+	}
+	
+	@UnitOfWork
+	public List<Bid> getAllBidsByPid(Long pid) {
+		EntityManager entityManager = entityManagerProvider.get();
+		
+		try {
+			TypedQuery<Bid> q = entityManager.createQuery("SELECT x FROM Bid x where x.pid=:pid ORDER BY x.amount Desc", Bid.class);
+			q.setParameter("pid", pid);
+			q.setMaxResults(10);
+			List<Bid> bids = q.getResultList();
+			return bids;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	@UnitOfWork
+	public List<Bid> getAllBidsByUid(Long uid) {
+		EntityManager entityManager = entityManagerProvider.get();
+		
+		try {
+			TypedQuery<Bid> q = entityManager.createQuery("SELECT x FROM Bid x where x.uid=:uid", Bid.class);
+			q.setParameter("uid", uid);
+			q.setMaxResults(10);
+			List<Bid> bids = q.getResultList();
+			return bids;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
 		}
 	}
 	

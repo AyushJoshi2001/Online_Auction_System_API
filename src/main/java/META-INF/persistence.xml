@@ -87,11 +87,11 @@
             <property name="hibernate.connection.driver_class" value="org.postgresql.Driver"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" />
 
-            <property name="hibernate.show_sql" value="false" />
-            <property name="hibernate.format_sql" value="false" /> 
+            <property name="hibernate.show_sql" value="true" />
+            <property name="hibernate.format_sql" value="true" /> 
             
+			<property name="hbm2ddl.auto" value="update" />
             <property name="hibernate.connection.autocommit" value="true" />
-			<property name="hbm2ddl.auto" value="validate/create/update/create-drop" />
             
             <!-- Connection Pooling settings -->
             <property name="hibernate.connection.provider_class"

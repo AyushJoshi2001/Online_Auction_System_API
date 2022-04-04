@@ -33,11 +33,9 @@
 
 package dao;
 
-import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
-import javax.persistence.TypedQuery;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -57,8 +55,8 @@ public class UserDao {
     public User registerUser(UserDto userDto) {
     	EntityManager entityManager = entityManagerProvider.get();
     	try {
-    		if((userDto.email).endsWith("@gmail.com")&& (userDto.email).length()>13 && (userDto.password).length()>=6) {    			
-    			User user = new User(userDto.name, userDto.email, userDto.password, userDto.profile_pic, userDto.mobile, userDto.address, userDto.userType);
+    		if((userDto.email).endsWith("@gmail.com")&& (userDto.email).length()>=13 && (userDto.password).length()>=6) {    			
+    			User user = new User(userDto.name, userDto.email, userDto.password, userDto.profile_pic, userDto.mobile, userDto.address, userDto.about);
     			entityManager.persist(user);
     			return user;
     		}
@@ -67,6 +65,22 @@ public class UserDao {
     		}
     	}
     	catch (Exception e) {
+			return null;
+		}
+    }
+    
+    
+    @UnitOfWork
+    public User getUserByEmail(String email) {
+    	EntityManager entityManager = entityManagerProvider.get();
+    	try {
+    		Query q = entityManager.createQuery("select x from User x where x.email=:email");
+    		q.setParameter("email", email);
+    		User user = (User)q.getSingleResult();
+    		return user;
+    	}
+    	catch (Exception e) {
+			e.printStackTrace();
 			return null;
 		}
     }
@@ -94,11 +108,12 @@ public class UserDao {
     		}
     		User user = entityManager.find(User.class, userDto.uid);
     		if(user !=null && (userDto.uid).equals(user.uid)) {
-    			Query query = entityManager.createQuery("update User set name=:name, profile_pic=:profile_pic, mobile=:mobile, address=:address where uid=:uid");
+    			Query query = entityManager.createQuery("update User set name=:name, profile_pic=:profile_pic, mobile=:mobile, address=:address, about=:about where uid=:uid");
     			query.setParameter("name", userDto.name);
     			query.setParameter("profile_pic", userDto.profile_pic);
     			query.setParameter("mobile", userDto.mobile);
     			query.setParameter("address", userDto.address);
+    			query.setParameter("about", userDto.about);
     			query.setParameter("uid", userDto.uid);
     			query.executeUpdate();
     			return true;
@@ -113,26 +128,42 @@ public class UserDao {
 		}
     }
     
+    @Transactional
+    public User getUserById(Long uid) {
+    	EntityManager entityManager = entityManagerProvider.get();
+    	try {
 
+			User user = entityManager.find(User.class, uid);
+			return user;
+    	}
+    	catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+    }
     
-    @UnitOfWork
-    public boolean isUserAndPasswordValid(String username, String password) {
+
+
+    public boolean isUserAndPasswordValid(String email, String password) {
         
-        if (username != null && password != null) {
+        if (email != null && password != null) {
             
-            EntityManager entityManager = entityManagerProvider.get();
-            
-            TypedQuery<User> q = entityManager.createQuery("SELECT x FROM User x WHERE username = :usernameParam", User.class);
-            User user = getSingleResult(q.setParameter("usernameParam", username));
-
-            if (user != null) {
-                
-                if (user.password.equals(password)) {
-
-                    return true;
-                }
-                
+            try {
+	            User user = getUserByEmail(email);
+	
+	            if (user != null) {
+	                
+	                if (user.password.equals(password)) {
+	
+	                    return true;
+	                }
+	                
+	            }
             }
+            catch (Exception e) {
+				e.printStackTrace();
+				return false;
+			}
 
         }
         
@@ -147,15 +178,15 @@ public class UserDao {
      * Get single result without throwing NoResultException, you can of course just catch the
      * exception and return null, it's up to you.
      */
-    private static <T> T getSingleResult(TypedQuery<T> query) {
-        query.setMaxResults(1);
-        List<T> list = query.getResultList();
-        if (list == null || list.isEmpty()) {
-            return null;
-        }
-
-        return list.get(0);
-    }
+//    private static <T> T getSingleResult(TypedQuery<T> query) {
+//        query.setMaxResults(1);
+//        List<T> list = query.getResultList();
+//        if (list == null || list.isEmpty()) {
+//            return null;
+//        }
+//
+//        return list.get(0);
+//    }
     
 
 }

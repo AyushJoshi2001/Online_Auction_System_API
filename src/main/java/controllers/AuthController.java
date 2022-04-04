@@ -35,7 +35,6 @@ package controllers;
 import ninja.Context;
 import ninja.Result;
 import ninja.Results;
-import ninja.params.Param;
 import ninja.params.PathParam;
 import ninja.session.Session;
 
@@ -43,6 +42,7 @@ import com.google.inject.Inject;
 import com.google.inject.Singleton;
 
 import dao.UserDao;
+import models.LoginDto;
 import models.User;
 import models.UserDto;
 
@@ -74,7 +74,8 @@ public class AuthController {
     public Result updateUser(UserDto userDto) {
     	boolean user = userDao.updateUser(userDto);
     	if(user) {    		
-    		return Results.json().render("User SuccessFully Updated");
+    		User updatedUser = userDao.getUser(userDto.uid);
+    		return Results.json().render(updatedUser);
     	}
     	return Results.badRequest().json().render("Bad Request");
     }
@@ -91,33 +92,20 @@ public class AuthController {
 
     }
 
-    public Result loginPost(@Param("username") String username,
-                            @Param("password") String password,
-                            @Param("rememberMe") Boolean rememberMe,
-                            Context context) {
+    public Result loginPost(LoginDto loginDto, Session session) {
 
-        boolean isUserNameAndPasswordValid = userDao.isUserAndPasswordValid(username, password);
+        boolean isUserNameAndPasswordValid = userDao.isUserAndPasswordValid(loginDto.email, loginDto.password);
 
         if (isUserNameAndPasswordValid) {
-            Session session = context.getSession();
-            session.put("username", username);
-
-            if (rememberMe != null && rememberMe) {
-                session.setExpiryTime(24 * 60 * 60 * 1000L);
-            }
-
-            context.getFlashScope().success("login.loginSuccessful");
-
-            return Results.redirect("/");
+        	session.put("email", loginDto.email);
+        	session.put("password", loginDto.password);
+        	session.setExpiryTime(24*60*60*1000L);
+        	User user = userDao.getUserByEmail(loginDto.email);
+        	return Results.ok().json().render(user);
 
         } else {
 
-            // something is wrong with the input or password not found.
-            context.getFlashScope().put("username", username);
-            context.getFlashScope().put("rememberMe", String.valueOf(rememberMe));
-            context.getFlashScope().error("login.errorLogin");
-
-            return Results.redirect("/login");
+        	return Results.unauthorized().json().render("Unauthorized User");
 
         }
 
@@ -130,9 +118,10 @@ public class AuthController {
 
         // remove any user dependent information
         context.getSession().clear();
-        context.getFlashScope().success("login.logoutSuccessful");
+//        context.getFlashScope().success("login.logoutSuccessful");
 
-        return Results.redirect("/");
+//        return Results.redirect("/");
+        return Results.json().render("SuccessFully logged out");
 
     }
 

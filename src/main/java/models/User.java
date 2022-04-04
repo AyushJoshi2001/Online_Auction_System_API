@@ -18,8 +18,6 @@ package models;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -46,15 +44,14 @@ public class User {
     public String mobile;
     @Column(name="address")
     public String address;
-    @Column(name="userType")
-    @Enumerated(EnumType.STRING)
-    public UserType userType;
+    @Column(name="about")
+    public String about;
     @Column(name = "isAdmin")
     public int isAdmin;
     
     public User() {}
 
-	public User(String name, String email, String password, String profile_pic, String mobile, String address, UserType userType) {
+	public User(String name, String email, String password, String profile_pic, String mobile, String address, String about) {
 		super();
 		this.name = name;
 		this.email = email;
@@ -62,10 +59,7 @@ public class User {
 		this.profile_pic = profile_pic;
 		this.mobile = mobile;
 		this.address = address;
-		this.userType = userType;
+		this.about = about;
 		this.isAdmin = 0;
 	}
-    
-    
- 
 }

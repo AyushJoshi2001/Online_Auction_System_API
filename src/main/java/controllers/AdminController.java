@@ -1,17 +1,35 @@
 package controllers;
 
+import com.google.inject.Inject;
+
+import dao.AdminDao;
+import models.Product;
+import models.User;
 import ninja.Result;
 import ninja.Results;
+import ninja.params.PathParam;
 
 public class AdminController {
-
-	public Result deleteUser(){
+	@Inject
+	AdminDao adminDao;
+	
+	public Result deleteUser(@PathParam("uid") Long uid){
 		
-		return Results.json().render("user deleted");
+		User deletedUser = adminDao.deleteUser(uid);
+		
+		if(deletedUser != null) {
+			return Results.json().render(deletedUser);
+		}
+		return Results.badRequest().json().render("Bad Request");
 	}
 	
-	public Result deleteProduct() {
+	public Result deleteProduct(@PathParam("pid") Long pid) {
+		Product deletedProduct = adminDao.deleteProduct(pid);
 		
-		return Results.json().render("Product deleted");
+		if(deletedProduct != null) {
+			return Results.json().render(deletedProduct);
+		}
+		return Results.badRequest().json().render("Bad Request");
 	}
+	
 }

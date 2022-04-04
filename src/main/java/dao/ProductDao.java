@@ -52,12 +52,61 @@ public class ProductDao {
 		}
 	}
 	
+	
+	@UnitOfWork
+	public List<Product> getProductByTitle(String title) {
+		EntityManager entityManager = entityManagerProvider.get();
+		try {
+			TypedQuery<Product> q = entityManager.createQuery("SELECT x FROM Product x where x.title LIKE :title order by created_at desc", Product.class);
+			q.setParameter("title", title+"%");
+			List<Product> products = q.getResultList();
+			return products;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	
+	@UnitOfWork
+	public List<Product> getProductBySoldTo(Long uid) {
+		EntityManager entityManager = entityManagerProvider.get();
+		try {
+			TypedQuery<Product> q = entityManager.createQuery("SELECT x FROM Product x where x.sold_to=:uid order by created_at desc", Product.class);
+			q.setParameter("uid", uid);
+			List<Product> products = q.getResultList();
+			return products;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	@UnitOfWork
+	public List<Product> getProductByTitleAndUid(String title, Long uid) {
+		EntityManager entityManager = entityManagerProvider.get();
+		try {
+			TypedQuery<Product> q = entityManager.createQuery("SELECT x FROM Product x where x.uid=:uid AND x.title LIKE :title", Product.class);
+			q.setParameter("title", title+"%");
+			q.setParameter("uid", uid);
+			List<Product> products = q.getResultList();
+			return products;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+
+	
 	@Transactional
 	public boolean addProduct(ProductDto productDto) {
 		EntityManager entityManager = entityManagerProvider.get();
 		
 		try {
-			Product product = new Product(productDto.title, productDto.product_pic, productDto.description, Bid_Status.Open, productDto.uid, Sold_Status.Unsold);
+			Product product = new Product(productDto.title, productDto.product_pic, productDto.description, Bid_Status.Open, productDto.uid, Sold_Status.Unsold, productDto.base_price);
 			entityManager.persist(product);
 			return true;
 		}
@@ -75,10 +124,11 @@ public class ProductDao {
 		try {
 			Product product = entityManager.find(Product.class, pid);
 			if(product!=null && (product.uid).equals(productDto.uid)) {
-				Query updateQuery = entityManager.createQuery("update Product set title=:title, product_pic=:product_pic, description=:description where pid=:pid");
+				Query updateQuery = entityManager.createQuery("update Product set title=:title, product_pic=:product_pic, description=:description, base_price=:base_price where pid=:pid");
 				updateQuery.setParameter("title", productDto.title);
 				updateQuery.setParameter("product_pic", productDto.product_pic);
 				updateQuery.setParameter("description", productDto.description);
+				updateQuery.setParameter("base_price", productDto.base_price);
 				updateQuery.setParameter("pid", pid);
 				updateQuery.executeUpdate();
 				return true;

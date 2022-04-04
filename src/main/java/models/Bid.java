@@ -12,19 +12,26 @@ import javax.persistence.Table;
 public class Bid {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	Long b_id;
+	public Long b_id;
 	@Column(name="uid")
-	Long uid;
+	public Long uid;
 	@Column(name="pid")
-	Long pid;
+	public Long pid;
 	@Column(name="amount")
-	Long amount;
+	public Long amount;
+	@Column(name = "product_name")
+	public String product_name;
+
+	public Bid() {
+		
+	}
 	
-	public Bid(Long uid, Long pid, Long amount) {
+	public Bid(Long uid, Long pid, Long amount, String product_name) {
 		super();
 		this.uid = uid;
 		this.pid = pid;
 		this.amount = amount;
+		this.product_name = product_name;
 	}
 	
 }
