@@ -68,6 +68,21 @@ public class ProductDao {
 		}
 	}
 	
+	@UnitOfWork
+	public List<Product> getProductByUid(Long uid) {
+		EntityManager entityManager = entityManagerProvider.get();
+		try {
+			TypedQuery<Product> q = entityManager.createQuery("SELECT x FROM Product x where x.uid =:uid order by created_at desc", Product.class);
+			q.setParameter("uid", uid);
+			List<Product> products = q.getResultList();
+			return products;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	
 	@UnitOfWork
 	public List<Product> getProductBySoldTo(Long uid) {

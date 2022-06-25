@@ -36,6 +36,7 @@ package dao;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 
 import com.google.inject.Inject;
 import com.google.inject.Provider;
@@ -90,6 +91,19 @@ public class UserDao {
     	EntityManager entityManager = entityManagerProvider.get();
     	try {
     		User user = entityManager.find(User.class, uid);
+    		return user;
+    	}
+    	catch (Exception e) {
+			return null;
+		}
+    }
+    
+    @UnitOfWork
+    public User getMyProfile(String email) {
+    	EntityManager entityManager = entityManagerProvider.get();
+    	try {
+    		TypedQuery<User> query = entityManager.createQuery("SELECT x FROM User x WHERE email=:email", User.class).setParameter("email", email);
+    		User user = query.getSingleResult();
     		return user;
     	}
     	catch (Exception e) {

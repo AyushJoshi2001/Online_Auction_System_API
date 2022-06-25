@@ -25,7 +25,7 @@ public class ProductController {
 		if(products != null) {			
 			return Results.json().render(products);
 		}
-		return Results.json().render("Products Not Found");
+		return Results.badRequest().json().render("Bad Request");
 	}
 	
 	
@@ -42,7 +42,15 @@ public class ProductController {
 		if(products != null) {			
 			return Results.json().render(products);
 		}
-		return Results.json().render("No Product Found");
+		return Results.badRequest().json().render("Bad Request");
+	}
+	
+	public Result getProductByUid(@PathParam("uid") Long uid) {
+		List<Product> products = productDao.getProductByUid(uid);
+		if(products != null) {			
+			return Results.json().render(products);
+		}
+		return Results.badRequest().json().render("Bad Request");
 	}
 	
 	public Result getProductBySoldTo(@PathParam("uid") Long uid) {
@@ -50,7 +58,7 @@ public class ProductController {
 		if(products != null) {			
 			return Results.json().render(products);
 		}
-		return Results.json().render("No Product Found");
+		return Results.badRequest().json().render("Bad Request");
 	}
 	
 	public Result getProductByTitleAndUid(@PathParam("title") String title, @PathParam("uid") Long uid) {
@@ -58,7 +66,7 @@ public class ProductController {
 		if(products != null) {			
 			return Results.json().render(products);
 		}
-		return Results.json().render("No Product Found");
+		return Results.badRequest().json().render("Bad Request");
 	}
 
 	

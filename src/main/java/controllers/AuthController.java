@@ -70,6 +70,16 @@ public class AuthController {
     	return Results.badRequest().json().render("Bad Request");
     }
     
+    public Result getMyProfile(Context context) {
+    	String email = context.getSession().get("email");
+    	User user = userDao.getMyProfile(email);
+    	if(user != null) {    		
+    		user.password = null;
+    		return Results.json().render(user);
+    	}
+    	return Results.badRequest().json().render("Bad Request");
+    }
+    
     
     public Result updateUser(UserDto userDto) {
     	boolean user = userDao.updateUser(userDto);

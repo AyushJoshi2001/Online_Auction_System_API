@@ -83,7 +83,7 @@ public class Routes implements ApplicationRoutes {
         
         router.PUT().route("/api/updateUser").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(AuthController::updateUser);
         router.GET().route("/api/user/{uid}").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(AuthController::getUser);
-        
+        router.GET().route("/api/me").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(AuthController::getMyProfile);
         
         router.POST().route("/api/addProduct").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(ProductController::addProduct);
         router.DELETE().route("/api/deleteProduct").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(ProductController::deleteProduct);
@@ -94,6 +94,7 @@ public class Routes implements ApplicationRoutes {
         router.GET().route("/api/product/{pid}").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(ProductController::getSingleProduct);
         router.PUT().route("/api/product/productBidStatus/{pid}").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(BidController::changeBidStatus);
         router.GET().route("/api/product/getByTitle/{title}").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(ProductController::getProductByTitle);
+        router.GET().route("/api/product/getByUid/{uid}").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(ProductController::getProductByUid);
         router.GET().route("/api/product/getBySoldTo/{uid}").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(ProductController::getProductBySoldTo);
         router.GET().route("/api/product/getByTitleAndUid/{title}/{uid}").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(ProductController::getProductByTitleAndUid);
         
@@ -104,26 +105,6 @@ public class Routes implements ApplicationRoutes {
         
         router.POST().route("/api/admin/deleteUser/{uid}").filters(ValidateUserFilter.class, AdminFilter.class, CorsHandlerFilter.class).with(AdminController::deleteUser);
         router.POST().route("/api/admin/deleteProduct/{pid}").filters(ValidateUserFilter.class, AdminFilter.class, CorsHandlerFilter.class).with(AdminController::deleteProduct);
-        
-        ///////////////////////////////////////////////////////////////////////
-        // Create new article
-        ///////////////////////////////////////////////////////////////////////
-//        router.GET().route("/article/new").with(ArticleController::articleNew);
-//        router.POST().route("/article/new").with(ArticleController::articleNewPost);
-        
-        ///////////////////////////////////////////////////////////////////////
-        // Create new article
-        ///////////////////////////////////////////////////////////////////////
-//        router.GET().route("/article/{id}").with(ArticleController::articleShow);
-
-        ///////////////////////////////////////////////////////////////////////
-        // Api for management of software
-        ///////////////////////////////////////////////////////////////////////
-//        router.GET().route("/api/{username}/articles.json").with(ApiController::getArticlesJson);
-//        router.GET().route("/api/{username}/article/{id}.json").with(ApiController::getArticleJson);
-//        router.GET().route("/api/{username}/articles.xml").with(ApiController::getArticlesXml);
-//        router.POST().route("/api/{username}/article.json").with(ApiController::postArticleJson);
-//        router.POST().route("/api/{username}/article.xml").with(ApiController::postArticleXml);
  
         ///////////////////////////////////////////////////////////////////////
         // Assets (pictures / javascript)
