@@ -38,6 +38,8 @@ public class Product {
 	public Long sold_to;
 	@Column(name = "base_price")
 	public Long base_price;
+	@Column(name = "bid_end_date")
+	public Date bid_end_date;
 	
 	public Product() {
 		
@@ -45,7 +47,7 @@ public class Product {
 	
 	
 	public Product(String title, String product_pic, String description, Bid_Status bid_status, Long uid,
-			Sold_Status sold_status, Long sold_to, Long base_price) {
+			Sold_Status sold_status, Long sold_to, Long base_price, Date bid_end_date) {
 		super();
 		this.title = title;
 		this.product_pic = product_pic;
@@ -56,9 +58,10 @@ public class Product {
 		this.sold_status = sold_status;
 		this.sold_to = sold_to;
 		this.base_price = base_price;
+		this.bid_end_date = bid_end_date;
 	}
 	
-	public Product(String title, String product_pic, String description, Bid_Status bid_status, Long uid, Sold_Status sold_status, Long base_price) {
+	public Product(String title, String product_pic, String description, Bid_Status bid_status, Long uid, Sold_Status sold_status, Long base_price, Date bid_end_date) {
 		super();
 		this.title = title;
 		this.product_pic = product_pic;
@@ -68,5 +71,6 @@ public class Product {
 		this.uid = uid;
 		this.sold_status = sold_status;
 		this.base_price = base_price;
+		this.bid_end_date = bid_end_date;
 	}
 }

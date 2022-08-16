@@ -19,10 +19,12 @@ create table Product(
 	description varchar(500),
 	base_price int, 
 	bid_status varchar(10),
-	created_at Date,
+	created_at timestamp with time zone,
 	uid int,
 	sold_status varchar(10),
-	sold_to int
+	sold_to int,
+	sold_price int,
+	bid_end_date timestamp with time zone
 );
 
 create table bid(

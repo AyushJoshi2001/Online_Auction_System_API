@@ -17,6 +17,7 @@
 package dao;
 
 
+import java.util.Date;
 import java.util.List;
 
 import com.google.inject.Inject;
@@ -54,7 +55,7 @@ public class SetupDao {
             
             // Create a new product and save it
             
-            Product prod1 = new Product("car", "http://google.com", "this is demo product", Bid_Status.Open, new Long(8375889), Sold_Status.Unsold, new Long(100));
+            Product prod1 = new Product("car", "", "this is demo product", Bid_Status.Open, new Long(8375889), Sold_Status.Unsold, new Long(100), new Date());
             entityManager.persist(prod1);
             
             // Create a new bid and save it

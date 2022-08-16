@@ -91,9 +91,12 @@ public class Routes implements ApplicationRoutes {
         
         
         router.GET().route("/api/product").filters(CorsHandlerFilter.class).with(ProductController::getAllProducts);
+        router.GET().route("/api/product/totalCount").filters(CorsHandlerFilter.class).with(ProductController::totalProductCount);
         router.GET().route("/api/product/{pid}").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(ProductController::getSingleProduct);
         router.PUT().route("/api/product/productBidStatus/{pid}").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(BidController::changeBidStatus);
-        router.GET().route("/api/product/getByTitle/{title}").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(ProductController::getProductByTitle);
+        router.GET().route("/api/product/getByTitle/{title}").filters(CorsHandlerFilter.class).with(ProductController::getProductByTitle);
+        router.GET().route("/api/product/getById/{pid}").filters(CorsHandlerFilter.class).with(ProductController::getProductByPid);
+        router.GET().route("/api/product/getByMaxPrice/{maxPrice}").filters(CorsHandlerFilter.class).with(ProductController::getProductByMaxPrice);
         router.GET().route("/api/product/getByUid/{uid}").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(ProductController::getProductByUid);
         router.GET().route("/api/product/getBySoldTo/{uid}").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(ProductController::getProductBySoldTo);
         router.GET().route("/api/product/getByTitleAndUid/{title}/{uid}").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(ProductController::getProductByTitleAndUid);

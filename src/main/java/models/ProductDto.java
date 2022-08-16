@@ -13,6 +13,7 @@ public class ProductDto {
 	public Sold_Status sold_status;
 	public Long sold_to;
 	public Long base_price;
+	public Date bid_end_date;
 	
 	public ProductDto() {}
 }

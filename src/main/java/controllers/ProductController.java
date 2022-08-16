@@ -20,7 +20,6 @@ public class ProductController {
 	
 	
 	public Result getAllProducts() {
-		
 		ProductsDto products = productDao.getAllProducts();
 		if(products != null) {			
 			return Results.json().render(products);
@@ -28,6 +27,13 @@ public class ProductController {
 		return Results.badRequest().json().render("Bad Request");
 	}
 	
+	public Result totalProductCount() {
+		Integer totalCount = productDao.getTotalProductCount();
+		if(totalCount != null) {			
+			return Results.json().render(totalCount);
+		}
+		return Results.badRequest().json().render("Bad Request");
+	}
 	
 	public Result getSingleProduct(@PathParam("pid") Long pid) {
 		Product product = productDao.getSingleProduct(pid);
@@ -39,6 +45,22 @@ public class ProductController {
 	
 	public Result getProductByTitle(@PathParam("title") String title) {
 		List<Product> products = productDao.getProductByTitle(title);
+		if(products != null) {			
+			return Results.json().render(products);
+		}
+		return Results.badRequest().json().render("Bad Request");
+	}
+	
+	public Result getProductByPid(@PathParam("pid") Long pid) {
+		List<Product> products = productDao.getProductByPid(pid);
+		if(products != null) {			
+			return Results.json().render(products);
+		}
+		return Results.badRequest().json().render("Bad Request");
+	}
+	
+	public Result getProductByMaxPrice(@PathParam("maxPrice") Long maxPrice) {
+		List<Product> products = productDao.getProductByMaxPrice(maxPrice);
 		if(products != null) {			
 			return Results.json().render(products);
 		}

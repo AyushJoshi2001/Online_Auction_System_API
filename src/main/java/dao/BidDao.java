@@ -89,12 +89,15 @@ public class BidDao {
 				Query query1 = entityManager.createQuery("select uid from Bid where pid=:pid order by amount desc");
 				query1.setParameter("pid", pid);
 				query1.setMaxResults(1);
-				Long uid = (Long)query1.getSingleResult();
+				List<Long> uids = query1.getResultList();
 				
-				Query query2 = entityManager.createQuery("update Product set sold_to=:sold_to where pid=:pid");
-				query2.setParameter("sold_to", uid);
-				query2.setParameter("pid", pid);
-				query2.executeUpdate();
+				if(uids.size() > 0) {
+					Long uid = uids.get(0);
+					Query query2 = entityManager.createQuery("update Product set sold_to=:sold_to where pid=:pid");
+					query2.setParameter("sold_to", uid);
+					query2.setParameter("pid", pid);
+					query2.executeUpdate();
+				}
 				
 				return true;
 			}

@@ -38,6 +38,20 @@ public class ProductDao {
 	}
 	
 	@UnitOfWork
+	public Integer getTotalProductCount() {
+		EntityManager entityManager = entityManagerProvider.get();
+		try {
+			TypedQuery<Product> q = entityManager.createQuery("SELECT x FROM Product x", Product.class);
+			List<Product> products = q.getResultList();
+			return products.size();
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	@UnitOfWork
 	public Product getSingleProduct(Long pid) {
 		EntityManager entityManager = entityManagerProvider.get();
 		try {
@@ -59,6 +73,36 @@ public class ProductDao {
 		try {
 			TypedQuery<Product> q = entityManager.createQuery("SELECT x FROM Product x where x.title LIKE :title order by created_at desc", Product.class);
 			q.setParameter("title", title+"%");
+			List<Product> products = q.getResultList();
+			return products;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	@UnitOfWork
+	public List<Product> getProductByPid(Long pid) {
+		EntityManager entityManager = entityManagerProvider.get();
+		try {
+			TypedQuery<Product> q = entityManager.createQuery("SELECT x FROM Product x where x.pid=:pid order by created_at desc", Product.class);
+			q.setParameter("pid", pid);
+			List<Product> products = q.getResultList();
+			return products;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	@UnitOfWork
+	public List<Product> getProductByMaxPrice(Long maxPrice) {
+		EntityManager entityManager = entityManagerProvider.get();
+		try {
+			TypedQuery<Product> q = entityManager.createQuery("SELECT x FROM Product x where x.base_price<=:maxPrice order by created_at desc", Product.class);
+			q.setParameter("maxPrice", maxPrice);
 			List<Product> products = q.getResultList();
 			return products;
 		}
@@ -121,7 +165,7 @@ public class ProductDao {
 		EntityManager entityManager = entityManagerProvider.get();
 		
 		try {
-			Product product = new Product(productDto.title, productDto.product_pic, productDto.description, Bid_Status.Open, productDto.uid, Sold_Status.Unsold, productDto.base_price);
+			Product product = new Product(productDto.title, productDto.product_pic, productDto.description, Bid_Status.Open, productDto.uid, Sold_Status.Unsold, productDto.base_price, productDto.bid_end_date);
 			entityManager.persist(product);
 			return true;
 		}
