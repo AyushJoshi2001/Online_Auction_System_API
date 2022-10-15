@@ -1,5 +1,6 @@
 package dao;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -12,8 +13,10 @@ import com.google.inject.persist.Transactional;
 
 import models.Bid;
 import models.BidDto;
+import models.Bid_Status;
 import models.Product;
 import models.ProductDto;
+import models.Sold_Status;
 import ninja.jpa.UnitOfWork;
 
 public class BidDao {
@@ -79,22 +82,24 @@ public class BidDao {
 		try {
 			Product product = entityManager.find(Product.class, pid);
 			
-			if(product != null && (product.uid).equals(productDto.uid) && (productDto.bid_status).name().toLowerCase().equals("close")) {
-				Query query = entityManager.createQuery("update Product set bid_status=:bid_status, sold_status=:sold_status where pid=:pid");
-				query.setParameter("bid_status", productDto.bid_status);
-				query.setParameter("sold_status", productDto.sold_status);
+			if(product != null && (product.uid).equals(productDto.uid) && (productDto.bid_status).name().toLowerCase().equalsIgnoreCase("close")) {
+				Query query = entityManager.createQuery("update Product set bid_status=:bid_status where pid=:pid");
+				query.setParameter("bid_status", Bid_Status.Close);
 				query.setParameter("pid", pid);
 				query.executeUpdate();				
 		
-				Query query1 = entityManager.createQuery("select uid from Bid where pid=:pid order by amount desc");
+				Query query1 = entityManager.createQuery("select x from Bid x where x.pid=:pid order by x.amount desc");
 				query1.setParameter("pid", pid);
 				query1.setMaxResults(1);
-				List<Long> uids = query1.getResultList();
+				List<Bid> bids = query1.getResultList();
 				
-				if(uids.size() > 0) {
-					Long uid = uids.get(0);
-					Query query2 = entityManager.createQuery("update Product set sold_to=:sold_to where pid=:pid");
+				if(bids.size() > 0) {
+					Long uid = bids.get(0).uid;
+					Long sold_price = bids.get(0).amount;
+					Query query2 = entityManager.createQuery("update Product set sold_to=:sold_to, sold_price=:sold_price, sold_status=:sold_status where pid=:pid");
 					query2.setParameter("sold_to", uid);
+					query2.setParameter("sold_price", sold_price);
+					query2.setParameter("sold_status", Sold_Status.Sold);
 					query2.setParameter("pid", pid);
 					query2.executeUpdate();
 				}
@@ -109,6 +114,48 @@ public class BidDao {
 		catch (Exception e) {
 			e.printStackTrace();
 			return false;
+		}
+	}
+	
+	@Transactional
+	public void closeBids() {
+		System.out.println("Inside closeBids");
+		EntityManager entityManager = entityManagerProvider.get();
+		long bid_end_date = System.currentTimeMillis();
+		
+		try {
+			TypedQuery<Product>  q =  entityManager.createQuery("select x from Product x where x.bid_status='Open' and x.bid_end_date<:bid_end_date", Product.class);
+			q.setParameter("bid_end_date", new Date(bid_end_date));
+			q.setMaxResults(50);
+			List<Product> notSoldProducts = q.getResultList();
+			
+			for(Product product : notSoldProducts) {
+				long pid = product.pid;
+				Query query1 = entityManager.createQuery("select x from Bid x where x.pid=:pid order by x.amount desc");
+				query1.setParameter("pid", pid);
+				query1.setMaxResults(1);
+				List<Bid> bids = query1.getResultList();
+				
+				if(bids.size() > 0) {
+					Long uid = bids.get(0).uid;
+					Long sold_price = bids.get(0).amount;
+					Query query2 = entityManager.createQuery("update Product set sold_to=:sold_to, sold_price=:sold_price, sold_status='Sold', bid_status='Close' where pid=:pid");
+					query2.setParameter("sold_to", uid);
+					query2.setParameter("sold_price", sold_price);
+					query2.setParameter("pid", pid);
+					query2.executeUpdate();
+				}
+				else {
+					Query query2 = entityManager.createQuery("update Product set sold_status='Unsold', bid_status='Close' where pid=:pid");
+					query2.setParameter("pid", pid);
+					query2.executeUpdate();
+				}
+				
+				System.out.println("updated product pid => " + pid);
+			}
+			
+		} catch(Exception e) {
+			e.printStackTrace();
 		}
 	}
 }

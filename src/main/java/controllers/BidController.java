@@ -49,5 +49,6 @@ public class BidController {
 			return Results.json().render("Bid_Status Changed SuccessFully");
 		}
 		
-		return Results.badRequest().json().render("Bad Request");	}
+		return Results.badRequest().json().render("Bad Request");	
+	}
 }

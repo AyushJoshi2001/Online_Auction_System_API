@@ -40,6 +40,8 @@ public class Product {
 	public Long base_price;
 	@Column(name = "bid_end_date")
 	public Date bid_end_date;
+	@Column(name = "sold_price")
+	public Long sold_price;
 	
 	public Product() {
 		
