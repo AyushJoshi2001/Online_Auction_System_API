@@ -22,11 +22,41 @@ public class ProductDao {
 	Provider<EntityManager> entityManagerProvider;
 	
 	@UnitOfWork
-	public ProductsDto getAllProducts() {
+	public ProductsDto getAllProducts(int pageNo, int pageSize, String title, Long pid, Long maxPrice) {
+		if(pageSize==0) pageSize = 10;
+		if(pageNo==0) pageNo = 1;
+		int offset = (pageNo-1)*pageSize;
 		EntityManager entityManager = entityManagerProvider.get();
+		List<Product> products;
+		System.out.println("pid =>" +pid + "title =>" +title + "maxPrice =>" +maxPrice);
 		try {
-			TypedQuery<Product> q = entityManager.createQuery("SELECT x FROM Product x", Product.class);
-			List<Product> products = q.getResultList();
+			if(pid!=null && pid!=0l) {
+				TypedQuery<Product> q = entityManager.createQuery("SELECT x FROM Product x where x.pid=:pid order by created_at desc", Product.class);
+				q.setParameter("pid", pid);
+				q.setFirstResult(offset);
+				q.setMaxResults(pageSize);
+				products = q.getResultList();
+			}
+			else if(maxPrice!=null && maxPrice!=0l){
+				TypedQuery<Product> q = entityManager.createQuery("SELECT x FROM Product x where x.base_price<=:maxPrice order by created_at desc", Product.class);
+				q.setParameter("maxPrice", maxPrice);
+				q.setFirstResult(offset);
+				q.setMaxResults(pageSize);
+				products = q.getResultList();
+			}
+			else if(title!=null) {
+				TypedQuery<Product> q = entityManager.createQuery("SELECT x FROM Product x where x.title LIKE :title order by created_at desc", Product.class);
+				q.setParameter("title", title+"%");
+				q.setFirstResult(offset);
+				q.setMaxResults(pageSize);
+				products = q.getResultList();
+			}
+			else {				
+				TypedQuery<Product> q = entityManager.createQuery("SELECT x FROM Product x order by created_at desc", Product.class);
+				q.setFirstResult(offset);
+				q.setMaxResults(pageSize);
+				products = q.getResultList();
+			}
 			ProductsDto productsDto = new ProductsDto();
 			productsDto.products = products;
 			return productsDto;
@@ -38,12 +68,27 @@ public class ProductDao {
 	}
 	
 	@UnitOfWork
-	public Integer getTotalProductCount() {
+	public Long getTotalProductCount() {
 		EntityManager entityManager = entityManagerProvider.get();
 		try {
-			TypedQuery<Product> q = entityManager.createQuery("SELECT x FROM Product x", Product.class);
-			List<Product> products = q.getResultList();
-			return products.size();
+			Query q = entityManager.createQuery("SELECT COUNT(pid) FROM Product");
+			Long productCount = (Long) q.getResultList().get(0);
+			return productCount;
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	@UnitOfWork
+	public Long totalProductCountByMaxPrice(Long maxPrice) {
+		EntityManager entityManager = entityManagerProvider.get();
+		try {
+			Query q = entityManager.createQuery("SELECT COUNT(x.pid) FROM Product x where x.base_price<=:maxPrice");
+			q.setParameter("maxPrice", maxPrice);
+			Long productCount = (Long) q.getResultList().get(0);
+			return productCount;
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -113,11 +158,16 @@ public class ProductDao {
 	}
 	
 	@UnitOfWork
-	public List<Product> getProductByUid(Long uid) {
+	public List<Product> getProductByUid(Long uid, int pageNo, int pageSize) {
+		if(pageSize==0) pageSize = 10;
+		if(pageNo==0) pageNo = 1;
+		int offset = (pageNo-1)*pageSize;
 		EntityManager entityManager = entityManagerProvider.get();
 		try {
 			TypedQuery<Product> q = entityManager.createQuery("SELECT x FROM Product x where x.uid =:uid order by created_at desc", Product.class);
 			q.setParameter("uid", uid);
+			q.setFirstResult(offset);
+			q.setMaxResults(pageSize);
 			List<Product> products = q.getResultList();
 			return products;
 		}

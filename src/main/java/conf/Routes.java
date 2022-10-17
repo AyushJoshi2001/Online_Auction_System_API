@@ -92,6 +92,7 @@ public class Routes implements ApplicationRoutes {
         
         router.GET().route("/api/product").filters(CorsHandlerFilter.class).with(ProductController::getAllProducts);
         router.GET().route("/api/product/totalCount").filters(CorsHandlerFilter.class).with(ProductController::totalProductCount);
+        router.GET().route("/api/product/totalCountByMaxPrice").filters(CorsHandlerFilter.class).with(ProductController::totalProductCountByMaxPrice);
         router.GET().route("/api/product/{pid}").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(ProductController::getSingleProduct);
         router.PUT().route("/api/product/productBidStatus/{pid}").filters(ValidateUserFilter.class, CorsHandlerFilter.class).with(BidController::changeBidStatus);
         router.GET().route("/api/product/getByTitle/{title}").filters(CorsHandlerFilter.class).with(ProductController::getProductByTitle);

@@ -12,6 +12,7 @@ import models.ProductsDto;
 import models.DeleteProductDto;
 import ninja.Result;
 import ninja.Results;
+import ninja.params.Param;
 import ninja.params.PathParam;
 
 public class ProductController {
@@ -19,8 +20,8 @@ public class ProductController {
 	ProductDao productDao;
 	
 	
-	public Result getAllProducts() {
-		ProductsDto products = productDao.getAllProducts();
+	public Result getAllProducts(@Param("pageNo") int pageNo, @Param("pageSize") int pageSize, @Param("title") String title, @Param("pid") Long pid, @Param("maxPrice") Long maxPrice) {
+		ProductsDto products = productDao.getAllProducts(pageNo, pageSize, title, pid, maxPrice);
 		if(products != null) {			
 			return Results.json().render(products);
 		}
@@ -28,7 +29,15 @@ public class ProductController {
 	}
 	
 	public Result totalProductCount() {
-		Integer totalCount = productDao.getTotalProductCount();
+		Long totalCount = productDao.getTotalProductCount();
+		if(totalCount != null) {			
+			return Results.json().render(totalCount);
+		}
+		return Results.badRequest().json().render("Bad Request");
+	}
+	
+	public Result totalProductCountByMaxPrice(@Param("maxPrice") Long maxPrice) {
+		Long totalCount = productDao.totalProductCountByMaxPrice(maxPrice);
 		if(totalCount != null) {			
 			return Results.json().render(totalCount);
 		}
@@ -67,8 +76,8 @@ public class ProductController {
 		return Results.badRequest().json().render("Bad Request");
 	}
 	
-	public Result getProductByUid(@PathParam("uid") Long uid) {
-		List<Product> products = productDao.getProductByUid(uid);
+	public Result getProductByUid(@PathParam("uid") Long uid, @Param("pageNo") int pageNo, @Param("pageSize") int pageSize) {
+		List<Product> products = productDao.getProductByUid(uid, pageNo, pageSize);
 		if(products != null) {			
 			return Results.json().render(products);
 		}
