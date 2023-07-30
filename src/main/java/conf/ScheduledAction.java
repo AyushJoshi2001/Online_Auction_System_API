@@ -18,6 +18,6 @@ public class ScheduledAction {
 	@Schedule(delay = 10, initialDelay = 5, timeUnit = TimeUnit.SECONDS)
 	public void closeBids() {
 		bidDao.closeBids();
-		System.out.println("closeBids running...");
+		System.out.println("close ended bids scheduler running...");
 	}
 }
